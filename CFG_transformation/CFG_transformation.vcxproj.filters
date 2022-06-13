@@ -18,5 +18,13 @@
     <ClCompile Include="CFG_transformation.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="CFG.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CFG.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
