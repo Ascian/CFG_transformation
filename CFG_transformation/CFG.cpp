@@ -60,6 +60,8 @@ void CFG::removeNoUseSymb()
 			auto temp = iter;
 			iter++;
 			N.erase(temp);
+			if (iter == N.end())
+				break;
 			iter--;	
 		}
 	}
@@ -69,7 +71,9 @@ void CFG::removeNoUseSymb()
 			auto temp = iter;
 			iter++;
 			T.erase(temp);
-			iter--;
+			if (iter == T.end())
+				break;
+			iter--;	
 		}
 	}
 
@@ -79,6 +83,8 @@ void CFG::removeNoUseSymb()
 				auto temp = iter;
 				iter++;
 				P.erase(temp);
+				if (iter == P.end())
+					break;
 				iter--;
 				break;
 			}
@@ -348,23 +354,25 @@ void CFG::transformToGNF()
 
 ostream& operator<<(ostream& Ostr, const CFG& cfg)
 {
-	Ostr << "Non-terminal symbol: {";
+	Ostr << "Non-terminal symbols: {";
 	auto iter = cfg.N.begin();
-	Ostr << *(iter++);
+	if(iter != cfg.N.end())
+		Ostr << *(iter++);
 	for (; iter != cfg.N.end(); iter++) {
 		Ostr << ", " << *iter;
 	}
 	Ostr << "}" << endl;
 
-	Ostr << "Terminal symbol: {";
+	Ostr << "Terminal symbols: {";
 	iter = cfg.T.begin();
-	Ostr << *(iter++);
+	if (iter != cfg.T.end())
+		Ostr << *(iter++);
 	for (; iter != cfg.T.end(); iter++) {
 		Ostr << ", " << *iter;
 	}
 	Ostr << "}" << endl;
 
-	Ostr << "Grammar production:" << endl;
+	Ostr << "Grammar productions:" << endl;
 	for (char symbol : cfg.N) {
 		Ostr << "   " << symbol << " -> ";
 		auto range = cfg.P.equal_range(symbol);
