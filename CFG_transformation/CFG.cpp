@@ -134,7 +134,7 @@ void CFG::removeDeltaTrans()
 			}	
 		}
 		if (i > 'Z')
-			throw "Terminal symbol's amount reached the maximun";
+			throw "Non-terminal symbol's amount reached the maximun";
 	}
 	P = newP;
 }
@@ -192,7 +192,7 @@ void CFG::transformToCNF()
 			}
 		}
 		if (i > 'Z')
-			throw "Terminal symbol's amount reached the maximun";
+			throw "Non-terminal symbol's amount reached the maximun";
 	}
 	for (auto& trans : P) {
 		if (trans.second.length() != 1) {
@@ -227,7 +227,7 @@ void CFG::transformToCNF()
 						}
 					}
 					if (j > 'Z')
-						throw "Terminal symbol's amount reached the maximun";
+						throw "Non-terminal symbol's amount reached the maximun";
 				}
 				
 			}
@@ -288,7 +288,7 @@ void CFG::transformToGNF()
 				}
 			}
 			if (i > 'Z')
-				throw "Terminal symbol's amount reached the maximun";
+				throw "Non-terminal symbol's amount reached the maximun";
 		}
 		else {
 			newP.merge(temp);
