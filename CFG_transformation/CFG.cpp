@@ -2,6 +2,7 @@
 
 void CFG::removeNoUseSymb()
 {
+	//找出有用非终结符
 	set<char> N0;
 	set<char> N1;
 	for (auto trans : P) {
@@ -13,6 +14,7 @@ void CFG::removeNoUseSymb()
 			}
 		}
 		if (flag == 0) {
+			//生成式右侧全为终结符
 			N1.insert(trans.first);
 		}
 	}
@@ -34,6 +36,7 @@ void CFG::removeNoUseSymb()
 	}
 	N = N1;
 
+	//找出有用符号
 	N0.clear();
 	N1.clear();
 	N0.insert(InitSymb);
@@ -54,6 +57,7 @@ void CFG::removeNoUseSymb()
 		}
 	}
 
+	//删除无用非终结符
 	for (auto iter = N.begin(); iter != N.end(); iter++) {
 		if (!N1.contains(*iter)) {
 			P.erase(*iter);
@@ -66,6 +70,7 @@ void CFG::removeNoUseSymb()
 		}
 	}
 
+	//删除无用终结符
 	for (auto iter = T.begin(); iter != T.end(); iter++) {
 		if (!N1.contains(*iter)) {
 			auto temp = iter;
@@ -77,6 +82,7 @@ void CFG::removeNoUseSymb()
 		}
 	}
 
+	//删除含有无用符号生成式
 	for (auto iter = P.begin(); iter != P.end(); iter++) {
 		for (char ch : iter->second) {
 			if (!(T.contains(ch) || N.contains(ch))) {
@@ -92,6 +98,7 @@ void CFG::removeNoUseSymb()
 	}
 }
 
+//递归加入删除Delta生成式后产生的新生成式
 void addNoDeltaTrans(multimap<char, string>& newP, const char symbol, const string& str, const set<char>& N1, int i) {
 	while(i < str.size()){
 		if (N1.contains(str[i])) {
@@ -107,6 +114,7 @@ void addNoDeltaTrans(multimap<char, string>& newP, const char symbol, const stri
 
 void CFG::removeDeltaTrans()
 {
+	//找到Delta生成式左侧非终结符
 	set<char> N1;
 	for (auto trans : P) {
 		if (trans.second.empty()) {
@@ -114,12 +122,14 @@ void CFG::removeDeltaTrans()
 		}
 	}
 
+	//加入删除Delta生成式后产生的新生成式
 	multimap<char, string> newP;
 	for (auto trans : P) {
 		if(!trans.second.empty())
 			addNoDeltaTrans(newP, trans.first, trans.second, N1, 0);
 	}
 	
+	//若初始非终结符能够生成Delta，加入新非终结符
 	if (N1.contains(InitSymb)) {
 		int i;
 		for (i = 'A'; i <= 'Z'; i++) {
@@ -141,8 +151,10 @@ void CFG::removeDeltaTrans()
 
 void CFG::removeSingleTrans()
 {
+
 	multimap<char, string> newP;
 	for (char symbol : N) {
+		//查找symbol能够直接到达的非终结符
 		set<char> N0;
 		N0.insert(symbol);
 		set<char> N1 = N0;
@@ -151,7 +163,6 @@ void CFG::removeSingleTrans()
 			if(iter->second.length() == 1 && N.contains(iter->second[0]))
 				N1.insert(iter->second[0]);
 		}
-
 		while (N0 != N1) {
 			N0 = N1;
 			for (char ch : N1) {
@@ -163,6 +174,7 @@ void CFG::removeSingleTrans()
 			}
 		}
 
+		//加入以symbol能够直接到达的非终结符为左侧的所有非单生成式为右侧，且以symbol为左侧的生成式
 		for (char ch : N1) {
 			range = P.equal_range(ch);
 			for (auto iter = range.first; iter != range.second; iter++) {
@@ -177,6 +189,7 @@ void CFG::removeSingleTrans()
 
 void CFG::transformToCNF()
 {
+	//加入能够直接获得终结符的生成式，以及新非终结符
 	multimap<char, string> newP;
 	map<char, char> nonTerminal;
 	for (char symbol : T) {
@@ -194,6 +207,8 @@ void CFG::transformToCNF()
 		if (i > 'Z')
 			throw "Non-terminal symbol's amount reached the maximun";
 	}
+
+	//将生成式右侧出现的所有终结符替换为非终结符
 	for (auto& trans : P) {
 		if (trans.second.length() != 1) {
 			for (int i = 0; i < trans.second.length(); i++) {
@@ -204,13 +219,15 @@ void CFG::transformToCNF()
 		}	
 	}
 
-	map<string, char> terminal;
+	//将右侧含有多个非终结符的生成式划分为多个右侧仅含有两个非终结符的生成式，并加入新非终结符
+	map<string, char> terminal;//生成式右侧到左侧的映射，避免相同映射的多次加入
 	for (auto trans : P) {
 		string restStr = trans.second;
 		if (trans.second.length() >= 2) {
 			for (int i = 0; i < trans.second.length() - 2; i++) {
+				//将生成式右侧最后两个非终结符替换为一个非终结符
 				string temp = restStr.substr(restStr.length() - 2, 2);
-				if (terminal.contains(temp)) {
+				if (terminal.contains(temp)) { 
 					restStr = restStr.substr(0, restStr.length() - 2);
 					restStr += terminal.find(temp)->second;
 				}
@@ -239,9 +256,11 @@ void CFG::transformToCNF()
 
 void CFG::transformToGNF()
 {
+	//消除左递归
 	set<char> newSymbol;
 	multimap<char, string> newP;
 	for (char symbol : N) {
+		//若生成式右侧第一个字符为非终结符且比symbol小，将其替换为其作为左侧的生成式的右侧
 		multimap<char, string> temp0;
 		multimap<char, string> temp = P;
 		int flag = 0;
@@ -252,7 +271,7 @@ void CFG::transformToGNF()
 			for (auto iter = range.first; iter != range.second; iter++) {
 				if (iter->second.length() == 0 || iter->second[0] >= symbol) {
 					if (iter->second[0] == symbol)
-						flag = 1;
+						flag = 1;//若存在右侧第一个字符为symbol的生成式
 					temp.insert(*iter);
 				}
 					
@@ -267,7 +286,7 @@ void CFG::transformToGNF()
 			}
 		}
 		
-
+		//加入新非终结符，消除右侧第一个字符为symbol的生成式
 		if (flag == 1) {
 			char i;
 			for (i = 'A'; i <= 'Z'; i++) {
@@ -295,6 +314,7 @@ void CFG::transformToGNF()
 		}
 	}
 	
+	//降序替换生成式右侧第一个非终结符
 	P = newP;
 	newP.clear();
 	auto iter = N.end();
@@ -329,6 +349,7 @@ void CFG::transformToGNF()
 		}
 	}
 
+	//替换将新加入非终结符作为左侧的生成式的右侧第一个非终结符
 	for (char symbol : newSymbol) {
 		auto range = P.equal_range(symbol);
 		for (auto iter2 = range.first; iter2 != range.second; iter2++) {
