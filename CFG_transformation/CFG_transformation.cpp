@@ -61,6 +61,8 @@ int main()
             cout << msg;
         }
     } 
+
+    system("pause");
     return 0;
 }
 

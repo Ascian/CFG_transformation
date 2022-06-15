@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="文档">
+      <UniqueIdentifier>{9bf1f434-6dd4-49ec-a1e4-574da8b6398d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CFG_transformation.cpp">
@@ -26,5 +29,10 @@
     <ClInclude Include="CFG.h">
       <Filter>头文件</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Document.md">
+      <Filter>文档</Filter>
+    </None>
   </ItemGroup>
 </Project>
